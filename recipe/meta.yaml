@@ -13,8 +13,6 @@ source:
     - patches/355.patch
     - patches/358.patch
     - patches/359.patch
-  ignore_run_exports_from:
-    - openssl
 
 build:
   number: 1
@@ -22,6 +20,8 @@ build:
     # SO name changes at minor rev bumps.
     - {{ pin_subpackage('sleef', max_pin='x') }}
   skip: true  # [win and vc<14]
+  ignore_run_exports_from:
+    - openssl
 
 requirements:
   build:
