@@ -29,6 +29,11 @@ fi
 mkdir build
 cd build
 
+if [[ "$target_platform" == "osx-arm64" ]]; then
+    export CC=/usr/bin/clang
+    export CFLAGS="$CFLAGS -isysroot $CONDA_BUILD_SYSROOT -arch arm64"
+fi
+
 if [[ "$target_platform" == linux-* ]]; then
     LDFLAGS="-lrt ${LDFLAGS}"
 fi
