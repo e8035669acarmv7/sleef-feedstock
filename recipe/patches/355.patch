@@ -1,0 +1,27 @@
+From 567a454ddf81fabba106844fa87c88116ebae9ce Mon Sep 17 00:00:00 2001
+From: Nikita Shulga <nikita.shulga@gmail.com>
+Date: Fri, 20 Nov 2020 15:19:22 -0800
+Subject: [PATCH] Fix undefined behaviour in vilogbk_vi_vd
+
+C standard do not define have left shift should affect the sign bit, which results in the following runtime error if `vilogbk_vi_vd` is compiled by clang with sanitizer checks enabled:
+```
+sleef/src/libm/sleefsimddp.c:329:49: runtime error: left shift of 4095 by 20 places cannot be represented in type 'int'
+```
+Can be fixed by explicitly specifying type of shift 1st operand as unsigned: i.e. replacing `1` with `1U`
+---
+ src/libm/sleefsimddp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libm/sleefsimddp.c b/src/libm/sleefsimddp.c
+index 5cad6dd4..c752afa7 100644
+--- a/src/libm/sleefsimddp.c
++++ b/src/libm/sleefsimddp.c
+@@ -326,7 +326,7 @@ static INLINE CONST VECTOR_CC vint vilogbk_vi_vd(vdouble d) {
+   vopmask o = vlt_vo_vd_vd(d, vcast_vd_d(4.9090934652977266E-91));
+   d = vsel_vd_vo_vd_vd(o, vmul_vd_vd_vd(vcast_vd_d(2.037035976334486E90), d), d);
+   vint q = vcastu_vi_vi2(vreinterpret_vi2_vd(d));
+-  q = vand_vi_vi_vi(q, vcast_vi_i(((1 << 12)-1) << 20));
++  q = vand_vi_vi_vi(q, vcast_vi_i(((1U << 12) - 1) << 20));
+   q = vsrl_vi_vi_i(q, 20);
+   q = vsub_vi_vi_vi(q, vsel_vi_vo_vi_vi(vcast_vo32_vo64(o), vcast_vi_i(300 + 0x3ff), vcast_vi_i(0x3ff)));
+   return q;

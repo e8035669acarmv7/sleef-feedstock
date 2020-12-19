@@ -1,0 +1,91 @@
+From 5bf0321a1bce31418bd32fd1504a96558a4e9eea Mon Sep 17 00:00:00 2001
+From: shibatch <shibatch.sf.net@gmail.com>
+Date: Wed, 25 Nov 2020 13:06:53 +0900
+Subject: [PATCH 1/2] no message
+
+---
+ .travis.yml              | 10 +++++-----
+ src/arch/helperadvsimd.h |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index a16524dc..c84ee0d0 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -8,11 +8,11 @@ dist: bionic
+ # Include osx jobs
+ matrix:
+   include:
+-    - os: osx
+-      arch: amd64
+-      compiler: clang # use default apple clang
+-      env:
+-        - LABEL="osx-clang"
++    # - os: osx
++    #   arch: amd64
++    #   compiler: clang # use default apple clang
++    #   env:
++    #     - LABEL="osx-clang"
+     - os: linux
+       services: docker
+       env:
+diff --git a/src/arch/helperadvsimd.h b/src/arch/helperadvsimd.h
+index fff30039..582ebfdc 100644
+--- a/src/arch/helperadvsimd.h
++++ b/src/arch/helperadvsimd.h
+@@ -332,7 +332,7 @@ static INLINE VECTOR_CC vmask veq_vm_vi2_vi2(vint2 x, vint2 y) { return vceqq_s3
+ static INLINE VECTOR_CC vmask vgt_vm_vi2_vi2(vint2 x, vint2 y) { return vcgeq_s32(x, y); }
+ // Comparison returning integers
+ static INLINE VECTOR_CC vint2 vgt_vi2_vi2_vi2(vint2 x, vint2 y) {
+-  return vreinterpretq_s32_u32(vcgeq_s32(x, y));
++  return vreinterpretq_s32_u32(vcgtq_s32(x, y));
+ }
+ static INLINE VECTOR_CC vint2 veq_vi2_vi2_vi2(vint2 x, vint2 y) {
+   return vreinterpretq_s32_u32(vceqq_s32(x, y));
+
+From 9ab271e16580a040054ea6ba8caf31952e64eca4 Mon Sep 17 00:00:00 2001
+From: shibatch <shibatch.sf.net@gmail.com>
+Date: Wed, 25 Nov 2020 16:02:21 +0900
+Subject: [PATCH 2/2] no message
+
+---
+ Jenkinsfile | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/Jenkinsfile b/Jenkinsfile
+index 47fb983f..4cd9d6a0 100644
+--- a/Jenkinsfile
++++ b/Jenkinsfile
+@@ -83,11 +83,31 @@ pipeline {
+             	     }
+                 }
+ 
++                stage('Mac') {
++            	     agent { label 'mac' }
++            	     steps {
++	    	     	 sh '''
++                	 echo "Mac with clang on" `hostname`
++			 export PATH=$PATH:/opt/local/bin:/opt/local/bin:/usr/local/bin:/usr/bin:/bin
++			 export CC=clang
++			 rm -rf build
++ 			 mkdir build
++			 cd build
++			 cmake -GNinja -DCMAKE_INSTALL_PREFIX=../install -DSLEEF_SHOW_CONFIG=1 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DENFORCE_TESTER3=TRUE -DBUILD_INLINE_HEADERS=TRUE -DBUILD_QUAD=TRUE -DENFORCE_SSE2=TRUE -DENFORCE_SSE4=TRUE -DENFORCE_AVX=TRUE -DENFORCE_FMA4=TRUE -DENFORCE_AVX2=TRUE -DENFORCE_AVX512F=TRUE ..
++			 ninja
++			 export OMP_WAIT_POLICY=passive
++		         export CTEST_OUTPUT_ON_FAILURE=TRUE
++		         ctest -j `sysctl -n hw.logicalcpu`
++		         ninja install
++			 '''
++            	     }
++                }
++
+                 stage('Static libs on mac') {
+             	     agent { label 'mac' }
+             	     steps {
+ 	    	     	 sh '''
+-                	 echo "macOS on" `hostname`
++                	 echo "Mac with gcc on" `hostname`
+ 			 export PATH=$PATH:/opt/local/bin:/opt/local/bin:/usr/local/bin:/usr/bin:/bin
+ 			 export CC=gcc-9
+ 			 rm -rf build
