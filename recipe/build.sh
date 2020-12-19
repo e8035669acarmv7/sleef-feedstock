@@ -7,7 +7,7 @@ if [[ "$target_platform" == linux-* ]]; then
     LDFLAGS="-lrt ${LDFLAGS}"
 fi
 
-cmake \
+cmake ${CMAKE_ARGS} \
     -GNinja \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_PREFIX_PATH=$PREFIX \
