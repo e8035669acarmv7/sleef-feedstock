@@ -1,0 +1,25 @@
+From 3268f8388ef7f78a849167a3997a32d1f00b247e Mon Sep 17 00:00:00 2001
+From: Nikita Shulga <nikita.shulga@gmail.com>
+Date: Tue, 17 Nov 2020 20:24:01 -0800
+Subject: [PATCH] Update build rules for Apple Silicon
+
+CMAKE_SYSTEM_PROCESSOR is set to "arm64" on Apple M1 machines
+
+Discovered while working on https://github.com/pytorch/pytorch/issues/48145
+---
+ Configure.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Configure.cmake b/Configure.cmake
+index 28e9b019..9fc1c2f6 100644
+--- a/Configure.cmake
++++ b/Configure.cmake
+@@ -144,7 +144,7 @@ if((CMAKE_SYSTEM_PROCESSOR MATCHES "x86") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "AM
+   set(TESTER3_DEFINITIONS_AVX512F       ATR=finz_ DPTYPE=__m512d SPTYPE=__m512 DPTYPESPEC=d8 SPTYPESPEC=f16 EXTSPEC=avx512f)
+   set(TESTER3_DEFINITIONS_AVX512FNOFMA  ATR=cinz_ DPTYPE=__m512d SPTYPE=__m512 DPTYPESPEC=d8 SPTYPESPEC=f16 EXTSPEC=avx512fnofma)
+ 
+-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
++elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+   set(SLEEF_ARCH_AARCH64 ON CACHE INTERNAL "True for Aarch64 architecture.")
+   # Aarch64 requires support for advsimdfma4
+   set(COMPILER_SUPPORTS_ADVSIMD 1)

@@ -1,0 +1,27 @@
+From ee1a98dd2c50cc05b27ba02e3509bd931a716f65 Mon Sep 17 00:00:00 2001
+From: Andrew Goodbody <andrew.goodbody@linaro.org>
+Date: Wed, 25 Nov 2020 00:00:53 +0000
+Subject: [PATCH] Fix undefined behaviour in xnextafterf
+
+---
+ src/libm/sleefsimdsp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libm/sleefsimdsp.c b/src/libm/sleefsimdsp.c
+index b7f2e55d..fede90ee 100644
+--- a/src/libm/sleefsimdsp.c
++++ b/src/libm/sleefsimdsp.c
+@@ -3028,11 +3028,11 @@ EXPORT CONST VECTOR_CC vfloat xnextafterf(vfloat x, vfloat y) {
+   vint2 xi2 = vreinterpret_vi2_vf(x);
+   vopmask c = vxor_vo_vo_vo(vsignbit_vo_vf(x), vge_vo_vf_vf(y, x));
+ 
+-  xi2 = vsel_vi2_vo_vi2_vi2(c, vsub_vi2_vi2_vi2(vcast_vi2_i(0), vxor_vi2_vi2_vi2(xi2, vcast_vi2_i(1 << 31))), xi2);
++  xi2 = vsel_vi2_vo_vi2_vi2(c, vsub_vi2_vi2_vi2(vcast_vi2_i(0), vxor_vi2_vi2_vi2(xi2, vcast_vi2_i(1U << 31))), xi2);
+ 
+   xi2 = vsel_vi2_vo_vi2_vi2(vneq_vo_vf_vf(x, y), vsub_vi2_vi2_vi2(xi2, vcast_vi2_i(1)), xi2);
+ 
+-  xi2 = vsel_vi2_vo_vi2_vi2(c, vsub_vi2_vi2_vi2(vcast_vi2_i(0), vxor_vi2_vi2_vi2(xi2, vcast_vi2_i(1 << 31))), xi2);
++  xi2 = vsel_vi2_vo_vi2_vi2(c, vsub_vi2_vi2_vi2(vcast_vi2_i(0), vxor_vi2_vi2_vi2(xi2, vcast_vi2_i(1U << 31))), xi2);
+ 
+   vfloat ret = vreinterpret_vf_vi2(xi2);
+ 
