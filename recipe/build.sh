@@ -30,6 +30,7 @@ mkdir build
 cd build
 
 if [[ "$target_platform" == "osx-arm64" ]]; then
+    # clang 11.0.0 segfaults. So use Apple's clang.
     export CC=/usr/bin/clang
     export CFLAGS="$CFLAGS -isysroot $CONDA_BUILD_SYSROOT -arch arm64"
 fi
