@@ -15,7 +15,7 @@ source:
     - patches/359.patch
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # SO name changes at minor rev bumps.
     - {{ pin_subpackage('sleef', max_pin='x') }}
@@ -28,6 +28,8 @@ requirements:
     - ninja        # [unix]
     - llvm-openmp  # [osx]
     - libgomp      # [linux]
+  host:
+    - openssl
 
 test:
   commands:
