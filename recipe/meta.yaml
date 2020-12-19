@@ -13,6 +13,8 @@ source:
     - patches/355.patch
     - patches/358.patch
     - patches/359.patch
+  ignore_run_exports_from:
+    - openssl
 
 build:
   number: 1
